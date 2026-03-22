@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>行走元大都：一座帝都的中轴线空间再发现</title>
+  <style>
+    :root {
+      --red-900: #4d0a0a;
+      --red-800: #6f1010;
+      --red-700: #8f1414;
+      --red-500: #b71c1c;
+      --gold: #d2b46f;
+      --ink: #191919;
+      --card: #ffffff;
+      --muted: #666666;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f8f6f4 0%, #f1ece6 100%);
+      line-height: 1.6;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      background: rgba(25, 25, 25, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .nav-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 68px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 18px;
+    }
+    .logo span { color: var(--gold); }
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 8px 0;
+    }
+    .nav-links a {
+      color: #f2f2f2;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color .3s ease;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .hero {
+      position: relative;
+      min-height: 86vh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: #fff;
+      text-align: center;
+      padding: 80px 20px 40px;
+    }
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+    .hero::before {
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.62)),
+        url("微信图片_20260311170957_835_33.jpg") center/cover no-repeat;
+      transform: scale(1.03);
+      animation: slowZoom 14s ease-in-out infinite alternate;
+    }
+    .hero::after {
+      background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.2), transparent 45%);
+      animation: glow 5s ease-in-out infinite;
+    }
+    @keyframes slowZoom {
+      from { transform: scale(1.03); }
+      to { transform: scale(1.1); }
+    }
+    @keyframes glow {
+      0%,100% { opacity: .35; }
+      50% { opacity: .7; }
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      animation: rise .9s ease-out both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(32px, 6vw, 60px);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .hero p {
+      margin: 0 auto 28px;
+      max-width: 760px;
+      color: #f7f0ea;
+      font-size: clamp(15px, 2.5vw, 20px);
+    }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(120deg, rgba(157, 17, 17, 0.8), rgba(92, 12, 12, 0.8));
+      box-shadow: var(--shadow);
+      transition: transform .3s ease, filter .3s ease;
+    }
+    .cta:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+    .section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 72px 16px 24px;
+    }
+    .title {
+      margin: 0 0 14px;
+      font-size: clamp(24px, 3.6vw, 36px);
+      color: var(--red-900);
+    }
+    .subtitle {
+      margin: 0 0 26px;
+      color: var(--muted);
+      max-width: 900px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid #eadfda;
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-btn {
+      border: 1px solid #c58f8f;
+      background: #fff;
+      color: var(--red-900);
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all .25s ease;
+    }
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--red-700);
+      color: #fff;
+      border-color: var(--red-700);
+    }
+    .spot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .spot-card {
+      padding: 14px;
+      border: 1px solid #eadfda;
+      background: #fff;
+      border-radius: 10px;
+      transition: transform .25s ease, box-shadow .25s ease;
+      cursor: pointer;
+    }
+    .spot-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(165, 41, 41, 0.2);
+    }
+    .spot-card h4 {
+      margin: 0 0 6px;
+      color: var(--red-800);
+    }
+    .spot-card p {
+      margin: 0;
+      font-size: 14px;
+      color: #484848;
+    }
+    .detail-box {
+      border-left: 4px solid var(--red-700);
+      background: #fff9f9;
+      padding: 14px;
+      min-height: 150px;
+    }
+    .detail-box h3 { margin: 0 0 8px; color: var(--red-800); }
+    .meta { color: #454545; font-size: 14px; margin: 5px 0; }
+
+    .routes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .route-card {
+      background: linear-gradient(160deg, #ffffff, #fff5f5);
+      border: 1px solid #edd9d9;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .route-card h4 { margin: 0 0 8px; color: var(--red-800); }
+    .route-card ul { margin: 8px 0 0; padding-left: 18px; }
+    .route-card .detail-link,
+    .research-card .detail-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: var(--red-700);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: background .25s ease;
+    }
+    .route-card .detail-link:hover,
+    .research-card .detail-link:hover {
+      background: var(--red-900);
+    }
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .research-card {
+      background: linear-gradient(160deg, #ffffff, #fff5f5);
+      border: 1px solid #edd9d9;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .research-card h4 { margin: 0 0 8px; color: var(--red-800); }
+    .research-card p { font-size: 14px; color: #484848; margin: 6px 0; }
+
+    .embed-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .embed-grid iframe {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      min-height: 420px;
+      background: #fff;
+    }
+    #game iframe {
+      width: 100%;
+      height: clamp(900px, 78vh, 1180px);
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .map-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #1f1f1f;
+      border: 1px solid #3b2222;
+    }
+    .map-toolbar {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      z-index: 5;
+      display: flex;
+      gap: 8px;
+    }
+    .map-toolbar button {
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: rgba(31, 31, 31, 0.75);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+    }
+    .map-stage {
+      transform-origin: center center;
+      transition: transform .25s ease;
+      position: relative;
+      min-height: 420px;
+    }
+    .map-stage img {
+      display: block;
+      width: 100%;
+      max-height: 680px;
+      object-fit: cover;
+      filter: saturate(0.96) contrast(1.04);
+    }
+    .pin {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #e60000;
+      border: 2px solid #ffd8d8;
+      box-shadow: 0 0 0 10px rgba(230, 0, 0, 0.12);
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    }
+    .pin-tip {
+      position: absolute;
+      min-width: 210px;
+      max-width: 320px;
+      background: #fff;
+      color: #222;
+      border: 1px solid #e7d7d7;
+      box-shadow: var(--shadow);
+      padding: 10px;
+      font-size: 13px;
+      display: none;
+      z-index: 10;
+    }
+    .pin-tip h5 { margin: 0 0 6px; color: var(--red-700); }
+
+    details {
+      border: 1px solid #eadfda;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    summary {
+      color: var(--red-800);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .footer {
+      margin-top: 60px;
+      background: #1d1111;
+      color: #f0e6dd;
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 14px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: all .6s ease;
+    }
+    .reveal.show {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 980px) {
+      .embed-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav-wrap">
+      <div class="logo">元大都<span>·中轴线</span>文化探索平台</div>
+      <nav class="nav-links">
+        <a href="#home">首页</a>
+        <a href="#explore">中轴线探索</a>
+        <a href="#map">详细地图</a>
+        <a href="#research">研究成果</a>
+        <a href="#about">项目介绍</a>
+        <a href="#game">闯关互动</a>
+      </nav>
+    </div>
+  </header>
+
+  <section id="home" class="hero">
+    <div class="hero-inner">
+      <h1>行走元大都：一座帝都的中轴线空间再发现</h1>
+      <p>
+        项目组以“文化展示 + 实用服务”为核心，整合中轴线遗迹、水网体系、宗教文化与线路规划，
+        通过地图交互、研究成果与游戏闯关，帮助游客在北京实景中重访元大都的城市记忆。
+      </p>
+      <a class="cta" href="#explore">开始探索</a>
+    </div>
+  </section>
+
+  <section id="explore" class="section reveal">
+    <h2 class="title">中轴线景点探索</h2>
+    <p class="subtitle">中轴线按北段、中段、南段分区浏览。点击卡片或地图红点可查看历史背景、文化价值与参观信息。</p>
+    <div class="panel">
+      <div class="filters" id="regionFilters">
+        <button class="filter-btn active" data-region="全部">全部</button>
+        <button class="filter-btn" data-region="北段">北段</button>
+        <button class="filter-btn" data-region="中段">中段</button>
+        <button class="filter-btn" data-region="南段">南段</button>
+      </div>
+      <div class="spot-grid" id="spotGrid"></div>
+      <div class="detail-box" id="spotDetail">
+        <h3>请选择景点查看详情</h3>
+        <div class="meta">将显示：景点介绍 / 历史背景 / 开放时间 / 门票 / 地理位置 / 交通方式。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="route" class="section reveal">
+    <h2 class="title">主题旅游线路规划</h2>
+    <p class="subtitle">根据中轴线、宗教文化、水网体系三条研究线，提供亮点说明与可执行行程。</p>
+    <div class="routes">
+      <article class="route-card">
+        <h4>线路A：元大都中轴线经典线（约4.5公里）</h4>
+        <p>亮点：从钟鼓楼到团城，重访“正天时、齐七政”的都城秩序与漕运枢纽。</p>
+        <ul>
+          <li>钟楼与鼓楼：城市报时与宵禁制度核心</li>
+          <li>万宁桥：中轴线第一桥，元代漕运关键节点</li>
+          <li>什刹海-景山-团城：水陆空间与宫苑演变</li>
+        </ul>
+        <a class="detail-link" href="中轴线详情.html">打开详细页面：中轴线主题旅游线路</a>
+      </article>
+      <article class="route-card">
+        <h4>线路B：民族融合与宗教共生线（约6公里）</h4>
+        <p>亮点：以宗教建筑见证元代“兼容并包”，理解中华文明“多元一体”。</p>
+        <ul>
+          <li>白塔寺 → 广济寺 → 万松老人塔</li>
+          <li>地铁接驳至牛街清真寺 → 白云观</li>
+          <li>可选延伸点：东岳庙（元代敕赐碑刻）</li>
+        </ul>
+        <a class="detail-link" href="宗教文化详情.html">打开详细页面：宗教文化线路</a>
+      </article>
+      <article class="route-card">
+        <h4>线路C：城市水网与市井生活线（半日）</h4>
+        <p>亮点：从金水河到高梁河，观察元大都水利、商业与日常生活如何共生。</p>
+        <ul>
+          <li>南长河沿线：引水线路历史展示</li>
+          <li>什刹海与积水潭：漕运终点与市井盛况</li>
+          <li>故宫内金水河：三朝宫城水系演变节点</li>
+        </ul>
+        <a class="detail-link" href="水系详情.html">打开详细页面：元大都水系线路</a>
+      </article>
+    </div>
+  </section>
+
+  <section id="map" class="section reveal">
+    <h2 class="title">详细地图与云游体验</h2>
+    <p class="subtitle">地图支持放大、缩小、重置；左侧为元大都景点分布示意，右侧为720云全景页面，可提前沉浸式云游。</p>
+    <div class="embed-grid">
+      <div class="panel">
+        <div class="map-wrap">
+          <div class="map-toolbar">
+            <button id="zoomIn" title="放大">+</button>
+            <button id="zoomOut" title="缩小">-</button>
+            <button id="zoomReset" title="重置">R</button>
+          </div>
+          <div class="map-stage" id="mapStage">
+            <img src="yuandadu.jpg" alt="元大都景点分布图" />
+            <div class="pin" style="left:63%; top:20%;" data-spot="钟楼"></div>
+            <div class="pin" style="left:60%; top:28%;" data-spot="鼓楼"></div>
+            <div class="pin" style="left:56%; top:36%;" data-spot="万宁桥"></div>
+            <div class="pin" style="left:48%; top:56%;" data-spot="白塔寺"></div>
+            <div class="pin" style="left:44%; top:62%;" data-spot="广济寺"></div>
+            <div class="pin" style="left:50%; top:72%;" data-spot="牛街清真寺"></div>
+            <div class="pin" style="left:39%; top:74%;" data-spot="白云观"></div>
+            <div class="pin-tip" id="pinTip"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <iframe src="https://www.720yun.com/vr/7fbjt7kmzf1" frameborder="no" width="700" height="500" title="720云全景体验"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section id="research" class="section reveal">
+    <h2 class="title">研究成果</h2>
+    <p class="subtitle">整合《中轴线》《多元宗教文化线路》《元大都的水网体系与城市生活》三篇成果，将文献考辨转化为空间叙事。</p>
+    <div class="panel research-grid">
+      <article class="research-card">
+        <h4>成果一：中轴线研究与遗迹活化</h4>
+        <p>项目依据史料与考古信息，认为元大都中轴线大体与明清中轴线一致，但遗迹留存更稀疏，需通过“遗址点位 + 历史叙事”实现价值转化。现阶段优先串联钟鼓楼、万宁桥、景山至团城，构建可步行、可讲述、可教育的文化廊道。</p>
+        <a class="detail-link" href="中轴线详情.html">跳转查看完整研究成果（中轴线）</a>
+      </article>
+      <article class="research-card">
+        <h4>成果二：宗教共生与民族融合空间</h4>
+        <p>元朝宗教政策呈现“承认现状、兼容并包”的特点。线路以白塔寺、广济寺、万松老人塔、牛街清真寺、白云观五点串联，展示藏传佛教、汉传佛教、伊斯兰教、道教在都城内并存发展的历史实态。</p>
+        <a class="detail-link" href="宗教文化详情.html">跳转查看完整研究成果（宗教文化）</a>
+      </article>
+      <article class="research-card">
+        <h4>成果三：城市水网、漕运系统与文旅转化</h4>
+        <p>研究指出元大都水系以金水河与高梁河为骨架：前者与皇城宫苑和政治象征密切相关，后者与积水潭、通惠河及城市商业运行深度耦合。郭守敬主持的通惠河工程通过24道水闸克服落差，形成高效漕运网络。</p>
+        <a class="detail-link" href="水系详情.html">跳转查看完整研究成果（水系）</a>
+      </article>
+    </div>
+  </section>
+
+  <section id="about" class="section reveal">
+    <h2 class="title">项目介绍</h2>
+    <p class="subtitle">面向公众文化科普与专业研究需求，构建“信息展示 + 互动探索 + 实用服务”一体化平台。</p>
+    <div class="panel">
+      <p>项目聚焦元世祖忽必烈时期营建的元大都空间遗产，围绕“中轴线、宗教文化、水网体系”三条主线开展史料考证、实地踏查和可视化转译。</p>
+      <p>平台提供景点检索、地图交互、主题路线、参观信息与闯关学习，既服务旅游出行，也服务课程教学与学术传播。</p>
+      <p>研究参考历史学、考古学、建筑学多学科成果，并结合北京在地遗存现状，强调“在保护中发展，在发展中保护”的可持续活化路径。</p>
+    </div>
+  </section>
+
+  <section id="game" class="section reveal">
+    <h2 class="title">游戏闯关小游戏</h2>
+    <p class="subtitle">题库依据《元大都历史文化研学·知识闯关》整理。完成答题可生成个人成绩证书，支持下载保存。</p>
+    <div class="panel">
+      <iframe src="闯关游戏.html" title="元大都闯关小游戏"></iframe>
+    </div>
+  </section>
+
+  <footer class="footer">
+    元大都北京中轴线文化探索平台 · 项目组出品 · 文化遗产数字化展示与公众教育实践
+  </footer>
+
+  <script>
+    const spots = [
+      { name: "钟楼", region: "北段", intro: "现存主体为明清建筑，但所在区域延续元代齐政楼与钟鼓制度传统。", history: "元代设置钟鼓设施以“使民知时”，与《元典章》所载禁夜制度密切关联。", open: "09:30-17:30", ticket: "参考景区公示", location: "东城区钟楼湾", traffic: "地铁8号线、公交鼓楼站" },
+      { name: "鼓楼", region: "北段", intro: "城市时间管理与礼仪秩序的重要空间，兼具观景与文化解说价值。", history: "“齐七政”观念映射元大都对天时、历法与都城治理的制度化认知。", open: "09:30-17:30", ticket: "参考景区公示", location: "东城区旧鼓楼大街", traffic: "地铁8号线什刹海站" },
+      { name: "万宁桥", region: "中段", intro: "“中轴线第一桥”，是北京中轴线上最古老且仍在使用的元代桥梁。", history: "与澄清闸、积水潭共同构成漕运系统节点，见证“舳舻蔽水”的繁荣。", open: "全天开放", ticket: "免费", location: "西城区地安门外大街", traffic: "公交北海北、地铁8号线" },
+      { name: "景山-团城段", region: "南段", intro: "团城前身为元代圆坻与仪天殿遗址，反映宫苑空间的朝代叠加。", history: "虽经明清改建，仍可观察元明清宫苑格局延续与重构关系。", open: "按景区公示", ticket: "按景区公示", location: "西城区北海南门外", traffic: "公交北海、步行联游" },
+      { name: "白塔寺", region: "中段", intro: "元代皇家敕建核心佛教建筑，现称妙应寺。", history: "由阿尼哥主持白塔营建，体现多民族工艺和藏传佛教传播。", open: "09:00-17:00", ticket: "参考景区公示", location: "西城区阜成门内", traffic: "地铁2号线阜成门站" },
+      { name: "广济寺", region: "中段", intro: "由金代西刘村寺发展而来，延续至今为重要汉传佛教寺院。", history: "见证元大都城内佛教空间的历史层累与制度连续性。", open: "以寺院公告为准", ticket: "以寺院公告为准", location: "西城区阜成门内大街", traffic: "地铁2号线阜成门站" },
+      { name: "牛街清真寺", region: "南段", intro: "元代已形成回回街社区，是北京伊斯兰文化的关键地标。", history: "反映元朝中西交流与穆斯林群体融入都城社会的历史过程。", open: "以寺院公告为准", ticket: "免费", location: "西城区牛街", traffic: "地铁4号线菜市口站换乘" },
+      { name: "白云观", region: "南段", intro: "道教全真龙门派祖庭，前身可追溯唐代，元代地位显著。", history: "全真道在蒙元时期得到重视，体现宗教治理与国家秩序关系。", open: "08:30-16:30", ticket: "参考景区公示", location: "西城区白云观街", traffic: "地铁1号线南礼士路站" }
+    ];
+
+    const spotGrid = document.getElementById("spotGrid");
+    const spotDetail = document.getElementById("spotDetail");
+    const regionFilters = document.getElementById("regionFilters");
+    const pinTip = document.getElementById("pinTip");
+    const mapStage = document.getElementById("mapStage");
+
+    function renderSpots(region = "全部") {
+      const view = region === "全部" ? spots : spots.filter(s => s.region === region);
+      spotGrid.innerHTML = view.map(s => `
+        <article class="spot-card" data-name="${s.name}">
+          <h4>${s.name} · ${s.region}</h4>
+          <p>${s.intro}</p>
+        </article>
+      `).join("");
+    }
+
+    function showDetail(name) {
+      const s = spots.find(item => item.name === name);
+      if (!s) return;
+      spotDetail.innerHTML = `
+        <h3>${s.name}</h3>
+        <div class="meta"><strong>景点介绍：</strong>${s.intro}</div>
+        <div class="meta"><strong>历史背景：</strong>${s.history}</div>
+        <div class="meta"><strong>开放时间：</strong>${s.open}</div>
+        <div class="meta"><strong>门票：</strong>${s.ticket}</div>
+        <div class="meta"><strong>地理位置：</strong>${s.location}</div>
+        <div class="meta"><strong>交通方式：</strong>${s.traffic}</div>
+      `;
+    }
+
+    regionFilters.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderSpots(btn.dataset.region);
+    });
+
+    spotGrid.addEventListener("click", (e) => {
+      const card = e.target.closest(".spot-card");
+      if (!card) return;
+      showDetail(card.dataset.name);
+    });
+
+    let scale = 1;
+    document.getElementById("zoomIn").addEventListener("click", () => {
+      scale = Math.min(scale + 0.15, 2.2);
+      mapStage.style.transform = `scale(${scale})`;
+    });
+    document.getElementById("zoomOut").addEventListener("click", () => {
+      scale = Math.max(scale - 0.15, 0.8);
+      mapStage.style.transform = `scale(${scale})`;
+    });
+    document.getElementById("zoomReset").addEventListener("click", () => {
+      scale = 1;
+      mapStage.style.transform = "scale(1)";
+    });
+
+    mapStage.addEventListener("click", (e) => {
+      const pin = e.target.closest(".pin");
+      if (!pin) {
+        pinTip.style.display = "none";
+        return;
+      }
+      const spot = spots.find(s => s.name === pin.dataset.spot);
+      if (!spot) return;
+      showDetail(spot.name);
+      pinTip.innerHTML = `<h5>${spot.name}</h5><div>${spot.intro}</div>`;
+      pinTip.style.left = `calc(${pin.style.left} + 12px)`;
+      pinTip.style.top = `calc(${pin.style.top} + 12px)`;
+      pinTip.style.display = "block";
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("show");
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+    renderSpots();
+  </script>
+</body>
+</html>

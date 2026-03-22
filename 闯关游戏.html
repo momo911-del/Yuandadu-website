@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>元大都知识闯关</title>
+  <style>
+    :root {
+      --red-900: #5a0b0b;
+      --red-700: #8d1515;
+      --red-500: #b32020;
+      --gold: #d5b36a;
+      --bg: #fffaf7;
+      --ink: #1f1f1f;
+      --muted: #666;
+      --ok: #1c7c3a;
+      --bad: #9f2020;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background: linear-gradient(180deg, #fffaf7, #f8efe8);
+      color: var(--ink);
+    }
+    .game {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #efdfd4;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: var(--red-900);
+      font-size: 24px;
+    }
+    .desc {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .name-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 220px;
+      padding: 10px;
+      border: 1px solid #d9c8c8;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 14px;
+      border: 1px solid var(--red-700);
+      background: var(--red-700);
+      color: #fff;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    button.secondary {
+      background: #fff;
+      color: var(--red-700);
+    }
+    .q {
+      border-top: 1px dashed #e6d4d4;
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    .q h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: var(--red-900);
+    }
+    .hint {
+      margin: 0 0 8px;
+      color: #6e4949;
+      font-size: 13px;
+    }
+    .options { display: grid; gap: 8px; }
+    label.option {
+      border: 1px solid #e8d8d8;
+      border-radius: 8px;
+      padding: 9px 10px;
+      cursor: pointer;
+      background: #fff;
+      transition: all .2s ease;
+      font-size: 14px;
+    }
+    label.option:hover { border-color: #cc9898; background: #fff9f9; }
+    .explain {
+      margin-top: 8px;
+      color: #4a4a4a;
+      background: #fef8f8;
+      border-left: 3px solid var(--red-500);
+      padding: 8px;
+      font-size: 13px;
+      display: none;
+    }
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1px solid #e0cfcf;
+      border-radius: 8px;
+      padding: 8px;
+      font-family: inherit;
+    }
+    .result {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff7f2;
+      border: 1px solid #ead7cf;
+      display: none;
+    }
+    .result.ok { border-color: #afd2ba; background: #f3fbf5; }
+    .result.bad { border-color: #e8c0c0; background: #fff5f5; }
+    .actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>元大都历史文化研学 · 知识闯关</h1>
+    <p class="desc">
+      选择题共 8 题，每题 10 分；开放题用于思考与表达。提交后可查看解析，并生成《元大都文明图鉴》成绩证书。
+    </p>
+    <div class="name-row">
+      <input id="playerName" type="text" placeholder="请输入你的姓名（用于证书）" />
+      <button id="submitBtn">提交答卷</button>
+      <button class="secondary" id="retryBtn">再试一次</button>
+      <button class="secondary" id="downloadBtn">生成证书</button>
+    </div>
+    <div id="quiz"></div>
+    <div class="q">
+      <h3>9. 开放题：宗教政策与“多元一体”</h3>
+      <p class="hint">请结合白塔寺、牛街清真寺、白云观等节点，简述元代宗教政策特点。</p>
+      <textarea placeholder="输入你的观点..."></textarea>
+    </div>
+    <div class="q">
+      <h3>10. 开放题：中轴线实地认知</h3>
+      <p class="hint">请写出从钟鼓楼到团城的至少两个遗迹，并说明历史意义。</p>
+      <textarea placeholder="输入你的观点..."></textarea>
+    </div>
+    <div id="result" class="result"></div>
+    <canvas id="certCanvas" width="1280" height="720"></canvas>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "元大都城市总体规划主要由哪位历史人物负责设计？",
+        hint: "考察：元大都营建的核心人物",
+        options: ["郭守敬", "刘秉忠", "耶律楚材", "阿尼哥"],
+        answer: 1,
+        exp: "刘秉忠是元大都总规划师，郭守敬主要负责水系工程。"
+      },
+      {
+        q: "中轴线上被誉为“第一桥”的元代桥梁是？",
+        hint: "考察：中轴线现存元代遗迹",
+        options: ["金水桥", "万宁桥", "卢沟桥", "玉带桥"],
+        answer: 1,
+        exp: "万宁桥始建于元代，是中轴线上最古老且仍在使用的元代桥梁。"
+      },
+      {
+        q: "元代积水潭（今什刹海）最核心的城市功能是？",
+        hint: "考察：水系与漕运关系",
+        options: ["皇家园林游览", "漕运码头终点", "军事防御要塞", "宗教祭祀场所"],
+        answer: 1,
+        exp: "通惠河开通后，积水潭成为大运河终点码头。"
+      },
+      {
+        q: "白塔寺藏式白塔由哪位尼泊尔工匠主持修建？",
+        hint: "考察：建筑与文化融合",
+        options: ["八思巴", "阿尼哥", "亦怜真", "迦鲁纳答思"],
+        answer: 1,
+        exp: "阿尼哥主持白塔修建，是元代多民族工艺交流代表。"
+      },
+      {
+        q: "牛街清真寺可靠证据指向其始建于哪个朝代？",
+        hint: "考察：伊斯兰教在元大都传播",
+        options: ["辽代", "宋代", "元代", "明代"],
+        answer: 2,
+        exp: "寺内元代墓碑等遗存支持“元初说”。"
+      },
+      {
+        q: "万松老人塔的内塔属于哪个朝代？",
+        hint: "考察：元代禅宗遗存",
+        options: ["辽代", "金代", "元代", "明代"],
+        answer: 2,
+        exp: "1986年修缮发现内塔为元代原构。"
+      },
+      {
+        q: "元大都钟鼓楼承担的主要职责是什么？",
+        hint: "考察：都城时间管理",
+        options: ["军事防御指挥", "城市报时与宵禁", "商品交易监督", "皇家祭祀仪式"],
+        answer: 1,
+        exp: "《元典章》记载钟声对应禁夜制度，是城市治理核心设施。"
+      },
+      {
+        q: "郭守敬主持修建的通惠河共设多少道水闸？",
+        hint: "考察：水利工程智慧",
+        options: ["12道", "18道", "24道", "30道"],
+        answer: 2,
+        exp: "24道水闸协同调节，解决水位落差，保障漕船入城。"
+      }
+    ];
+
+    const quiz = document.getElementById("quiz");
+    const result = document.getElementById("result");
+    const submitBtn = document.getElementById("submitBtn");
+    const retryBtn = document.getElementById("retryBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const playerNameInput = document.getElementById("playerName");
+
+    function renderQuiz() {
+      quiz.innerHTML = questions.map((item, idx) => `
+        <div class="q" data-idx="${idx}">
+          <h3>${idx + 1}. ${item.q}</h3>
+          <p class="hint">${item.hint}</p>
+          <div class="options">
+            ${item.options.map((opt, i) => `
+              <label class="option">
+                <input type="radio" name="q${idx}" value="${i}" />
+                ${String.fromCharCode(65 + i)}. ${opt}
+              </label>
+            `).join("")}
+          </div>
+          <div class="explain">${item.exp}</div>
+        </div>
+      `).join("");
+      result.style.display = "none";
+      result.className = "result";
+    }
+
+    function gradeQuiz() {
+      let score = 0;
+      questions.forEach((q, idx) => {
+        const checked = document.querySelector(`input[name="q${idx}"]:checked`);
+        const exp = document.querySelector(`.q[data-idx="${idx}"] .explain`);
+        if (checked && Number(checked.value) === q.answer) score += 10;
+        if (exp) exp.style.display = "block";
+      });
+      return score;
+    }
+
+    submitBtn.addEventListener("click", () => {
+      const score = gradeQuiz();
+      const name = (playerNameInput.value || "未署名同学").trim();
+      const level = score >= 70 ? "优秀" : (score >= 50 ? "良好" : "继续努力");
+      result.style.display = "block";
+      result.className = `result ${score >= 60 ? "ok" : "bad"}`;
+      result.innerHTML = `
+        <strong>${name}，你的得分：${score}/80（等级：${level}）</strong><br/>
+        已展开每题解析，可根据提示再次挑战并提升成绩。
+      `;
+      result.dataset.score = String(score);
+      result.dataset.name = name;
+    });
+
+    retryBtn.addEventListener("click", () => {
+      renderQuiz();
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      const name = result.dataset.name || (playerNameInput.value.trim() || "未署名同学");
+      const score = Number(result.dataset.score || 0);
+      const canvas = document.getElementById("certCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const g = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      g.addColorStop(0, "#fffaf6");
+      g.addColorStop(1, "#f6e8dd");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "#8d1515";
+      ctx.lineWidth = 10;
+      ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
+
+      ctx.fillStyle = "#5a0b0b";
+      ctx.font = "bold 56px Microsoft YaHei";
+      ctx.fillText("元大都文明图鉴 · 成就证书", 280, 170);
+
+      ctx.fillStyle = "#3a2a2a";
+      ctx.font = "32px Microsoft YaHei";
+      ctx.fillText(`授予：${name}`, 180, 300);
+      ctx.fillText(`成绩：${score} / 80`, 180, 370);
+      ctx.fillText("完成“元大都历史文化研学”知识闯关", 180, 440);
+      ctx.fillText("特此纪念", 180, 510);
+
+      ctx.fillStyle = "#8d1515";
+      ctx.font = "28px Microsoft YaHei";
+      const date = new Date().toLocaleDateString();
+      ctx.fillText(`日期：${date}`, 930, 610);
+      ctx.fillText("元大都中轴线文化探索平台", 820, 650);
+
+      const link = document.createElement("a");
+      link.download = `元大都证书_${name}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+
+    renderQuiz();
+  </script>
+</body>
+</html>
